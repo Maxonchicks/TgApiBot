@@ -3,6 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
+import psutil
 
 
 class AvitoParse:
@@ -33,6 +34,20 @@ class AvitoParse:
         }
 
         self.driver = uc.Chrome(version_main=self.version_brow, options=options)
+
+    def cleanup_driver(self):
+    """Закрытие драйвера и всех связанных процессов."""
+    if self.driver:
+        self.driver.quit()
+        self.driver = None
+
+    # Убиваем все дочерние процессы (например, браузерные процессы)
+    for proc in psutil.process_iter(['pid', 'name']):
+        if 'chromedriver' in proc.info['name'] or 'chrome' in proc.info['name']:
+            try:
+                psutil.Process(proc.info['pid']).terminate()
+            except psutil.NoSuchProcess:
+                pass
 
     def get_url(self):
         self.driver.get(self.url)
@@ -71,8 +86,7 @@ class AvitoParse:
                 pictures_product
             ]
         finally:
-            if self.driver:
-                self.driver.quit()
+            self.cleanup_driver()
 
     def parse(self):
         self.set_up()
