@@ -36,18 +36,18 @@ class AvitoParse:
         self.driver = uc.Chrome(version_main=self.version_brow, options=options)
 
     def cleanup_driver(self):
-    """Закрытие драйвера и всех связанных процессов."""
-    if self.driver:
-        self.driver.quit()
-        self.driver = None
-
-    # Убиваем все дочерние процессы (например, браузерные процессы)
-    for proc in psutil.process_iter(['pid', 'name']):
-        if 'chromedriver' in proc.info['name'] or 'chrome' in proc.info['name']:
-            try:
-                psutil.Process(proc.info['pid']).terminate()
-            except psutil.NoSuchProcess:
-                pass
+        """Закрытие драйвера и всех связанных процессов."""
+        if self.driver:
+            self.driver.quit()
+            self.driver = None
+    
+        # Убиваем все дочерние процессы (например, браузерные процессы)
+        for proc in psutil.process_iter(['pid', 'name']):
+            if 'chromedriver' in proc.info['name'] or 'chrome' in proc.info['name']:
+                try:
+                    psutil.Process(proc.info['pid']).terminate()
+                except psutil.NoSuchProcess:
+                    pass
 
     def get_url(self):
         self.driver.get(self.url)
